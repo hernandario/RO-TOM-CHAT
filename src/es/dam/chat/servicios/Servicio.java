@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import javax.swing.JTextArea;
 
+import es.dam.chat.presentacion.Chat;
 import es.dam.chat.presentacion.Consola;
 
 public class Servicio implements Runnable {
@@ -76,7 +77,7 @@ public class Servicio implements Runnable {
 			
 			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println("2");
+			otraSalida.println(Chat.BROADCAST_MENSAJE_RECIBIR_MENSAJES);
 			otraSalida.println(nickOtroUsuario +": " + mensaje);
 			
 		}
@@ -90,7 +91,7 @@ public class Servicio implements Runnable {
 			
 			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println("3");
+			otraSalida.println(Chat.BROADCAST_MENSAJE_BORRAR_USUARIO);
 			otraSalida.println(nickUsuario);
 		
 		}
@@ -110,12 +111,12 @@ public class Servicio implements Runnable {
 			
 			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println("2");
+			otraSalida.println(Chat.BROADCAST_MENSAJE_RECIBIR_MENSAJES);
 			otraSalida.println(nickUsuario + " se ha conectado.");
 			
 			for(int j = 0; j < Consola.lista_sockets.size(); j++){
 				
-				otraSalida.println("1");
+				otraSalida.println(Chat.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS);
 				otraSalida.println(Consola.lista_usuarios.get(j));
 				
 			}
