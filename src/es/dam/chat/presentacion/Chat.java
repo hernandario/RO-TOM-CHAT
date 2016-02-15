@@ -1,12 +1,341 @@
 package es.dam.chat.presentacion;
 
-public class Chat {
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.text.DefaultCaret;
+
+public class Chat extends JFrame {
 	
 	public static final int BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS = 1;
-	public static final int BROADCAST_MENSAJE_RECIBIR_MENSAJES = 2;
+	public static final int BROADCAST_MENSAJE_IO = 2;
 	public static final int BROADCAST_MENSAJE_BORRAR_USUARIO = 3;
 	public static final int BROADCAST_MENSAJE_ERROR_SERVIDOR = 4;
 	public static final int BROADCAST_MENSAJE_ERROR_USUARIO = 5;
+	
+	private static String ipServidor;
+	private static int puerto = 1988;
+	private static Socket socketConexion;
+	
+	private static PrintWriter salida;
+	private static Scanner entrada;
+	
+	private static String nickUsuario;
+	private static String mensaje;
+	
+	public static ArrayList<String> lista_usuarios = new ArrayList<String>();
+
+	private JPanel panelEnviar;
+	private JPanel panelChat;
+	
+	private static JTextArea taChat;
+	private JTextField tfMensajes;
+	private JButton btnEnviar;
+	private JLabel lblTitulo;
+	private JLabel lblPista;
+	
+	public static void main(String[] args){
+		
+		Chat c = new Chat();
+		iniciarChat();
+		
+		conexion();
+		
+		while(true){
+			broadCastReceiver();
+		}
+		
+	}
+	
+	public Chat(){
+		super("RO-TOM CHAT");
+		
+		
+		lblTitulo = new JLabel();
+		lblPista = new JLabel("Escribe aquí un mensaje...");
+		
+		taChat = new JTextArea();
+		taChat.setColumns(25);
+		DefaultCaret caret = (DefaultCaret) taChat.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+		taChat.setEditable(false);
+		taChat.setBorder(javax.swing.BorderFactory.createMatteBorder(3,3,3,3,new Color(25,10,80)));
+		taChat.setLineWrap(true);
+		taChat.setWrapStyleWord(true);
+		
+		tfMensajes = new JTextField(30);
+		tfMensajes.requestFocus();
+		
+		btnEnviar = new JButton("ENVIAR");
+		btnEnviar.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+				enviarMensaje();
+				
+			}
+			
+		});
+		
+		
+		panelEnviar = new JPanel();
+		panelEnviar.setLayout(new BorderLayout());
+		panelEnviar.add(lblPista, BorderLayout.NORTH);
+		panelEnviar.add(tfMensajes, BorderLayout.CENTER);
+		panelEnviar.add(btnEnviar, BorderLayout.EAST);
+		
+		panelChat = new JPanel();
+		panelChat.setLayout(new BorderLayout());
+		panelChat.add(lblTitulo, BorderLayout.NORTH);
+		panelChat.add(new JScrollPane(taChat), BorderLayout.CENTER);
+		panelChat.add(panelEnviar, BorderLayout.SOUTH);
+		
+		setLayout(new BorderLayout());
+		add(panelChat, BorderLayout.CENTER);
+		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(400, 900);
+		setLocationRelativeTo(null);
+		
+		addWindowListener(new WindowListener(){
+
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				
+				salida.println(Chat.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS);
+				
+				try{
+					
+					socketConexion.close();
+					System.exit(0);
+					
+				}catch(IOException ex){
+					
+					//Mensaje error
+					ex.printStackTrace();
+					
+				}
+				
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
+	}
+
+	public static void iniciarChat(){
+		
+		pedirIp();
+		pedirNick();
+		
+	}
+	
+	public static void pedirIp(){
+		
+		String ip = "";
+		
+		do{
+			
+			ip = JOptionPane.showInputDialog("Introduzca la IP del servidor al que se quiere conectar: ");
+			
+			if(ip.trim().equals(""))
+				JOptionPane.showMessageDialog(null, "No puede introducir una IP vacia","IP Vacia",
+						JOptionPane.ERROR_MESSAGE);
+			
+		}
+		while(ip.trim().equals(""));
+		
+		ipServidor = ip;
+		
+	}
+	
+	public static void pedirNick(){
+		
+		String nick = "";
+		
+		do{
+			
+			nick = JOptionPane.showInputDialog("Introduzca su nick:");
+			
+			if(nick.trim().equals(""))
+				JOptionPane.showMessageDialog(null, "No puede introducir un nick vacio","Nick Vacio",
+						JOptionPane.ERROR_MESSAGE);
+			
+		}
+		while(nick.trim().equals(""));
+		
+		nickUsuario = nick;
+		
+	}
+	
+	public static void broadCastReceiver(){
+		
+		if(entrada.hasNext()){
+			
+			switch(Integer.parseInt(entrada.nextLine())){
+			
+			case Chat.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS:
+				
+				//TODO: implmentar.
+				
+				break;
+				
+			case Chat.BROADCAST_MENSAJE_IO:
+				
+				mensaje = entrada.nextLine();
+				taChat.append(mensaje);
+				taChat.append("\n");
+				
+				break;
+				
+			case Chat.BROADCAST_MENSAJE_BORRAR_USUARIO:
+				
+				String usuario = entrada.nextLine();
+				
+				lista_usuarios.remove(lista_usuarios.indexOf(usuario));
+				taChat.append(usuario + " ha abandonado el chat");
+				
+				break;
+				
+			case Chat.BROADCAST_MENSAJE_ERROR_SERVIDOR:
+				
+				JOptionPane.showMessageDialog(null, "ERROR: NO ES POSIBLE ENCONTRAR EL SERVIDOR, INTENTELO MÁS TARDE",
+						"Error De Conexión",JOptionPane.ERROR_MESSAGE);
+	    		System.exit(0);
+				
+				break;
+				
+			case Chat.BROADCAST_MENSAJE_ERROR_USUARIO:
+				
+				try{
+					socketConexion.close();
+				}catch(IOException ex){
+					
+					//TODO Mensaje de error
+					ex.printStackTrace();
+					
+				}
+				
+				JOptionPane.showMessageDialog(null, "ERROR: Ese nick ya se está utilizando","Nick En Uso",JOptionPane.ERROR_MESSAGE);
+				
+				break;
+			
+			
+			}
+			
+		}
+		
+	}
+	
+	public void actualizarListaUsuarios(){
+		
+		//TODO
+		
+	}
+	
+	public static void conexion(){
+		
+		try{
+			
+			socketConexion = new Socket(ipServidor, puerto);
+			
+			salida = new PrintWriter(socketConexion.getOutputStream(), true);
+			entrada = new Scanner(socketConexion.getInputStream());
+			salida.println(nickUsuario);
+			
+		}catch(UnknownHostException ex){
+			
+			//Mensaje de error
+			ex.printStackTrace();
+			
+		} catch (IOException ex) {
+			
+			JOptionPane.showMessageDialog(null, ("ERROR:NO HAY NINGÚN SERVIDOR EJECUTANDOSE EN LA IP: " + ipServidor + "."),
+					"Error de conexión",JOptionPane.ERROR_MESSAGE);
+			
+			ex.printStackTrace();
+			System.exit(0);
+		}
+		
+	}
+	
+	public static void mostrarMensaje(String linea){
+		//TODO
+	}
+	
+	public void enviarMensaje(){
+		
+		mensaje = tfMensajes.getText();
+		
+		if(mensaje.trim().equals(""))
+			JOptionPane.showMessageDialog(null, "No se pueden enviar mensajes vacios","Mensaje vacio",JOptionPane.ERROR_MESSAGE);
+		
+		else{
+			
+			tfMensajes.setText("");
+			salida.println(Chat.BROADCAST_MENSAJE_IO);
+			salida.println(nickUsuario);
+			//fecha
+			salida.println(mensaje);
+			
+		}
+		
+	}
 	
 
 }

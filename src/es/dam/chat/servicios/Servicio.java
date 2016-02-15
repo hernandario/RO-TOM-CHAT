@@ -50,13 +50,29 @@ public class Servicio implements Runnable {
 		
 		while(entrada.hasNext()){
 			
-			switch(Integer.parseInt(entrada.nextLine())){
+			int opcion = Integer.parseInt(entrada.nextLine());
+			
+			switch(opcion){
 			
 			case USUARIO_ABANDONA:
+				
+				try {
+					AbandonarChat();
+				} catch (IOException ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				}
 				
 				break;
 				
 			case USUARIO_ENVIA_MENSAJE:
+				
+				try {
+					enviarMensaje();
+				} catch (IOException ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				}
 				
 				break;
 			
@@ -77,7 +93,7 @@ public class Servicio implements Runnable {
 			
 			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println(Chat.BROADCAST_MENSAJE_RECIBIR_MENSAJES);
+			otraSalida.println(Chat.BROADCAST_MENSAJE_IO);
 			otraSalida.println(nickOtroUsuario +": " + mensaje);
 			
 		}
@@ -111,7 +127,7 @@ public class Servicio implements Runnable {
 			
 			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println(Chat.BROADCAST_MENSAJE_RECIBIR_MENSAJES);
+			otraSalida.println(Chat.BROADCAST_MENSAJE_IO);
 			otraSalida.println(nickUsuario + " se ha conectado.");
 			
 			for(int j = 0; j < Consola.lista_sockets.size(); j++){

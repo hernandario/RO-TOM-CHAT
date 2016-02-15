@@ -20,14 +20,13 @@ import es.dam.chat.servicios.Servicio;
 
 public class Consola extends JFrame {
 	
-	private static final String MENSAJE_SALIDA = "5";
 	
 	private static JTextArea consola;
 	private static Scanner entrada;
 	private static PrintWriter salida;
 	private static Socket socketCliente;
 	private static ServerSocket socketServidor;
-	private static String nombreUsuario;
+	private static String nickUsuario;
 	private static int puerto = 1988;
 	private static Servicio servicio;
 	
@@ -71,7 +70,7 @@ public class Consola extends JFrame {
 					try{
 						
 						PrintWriter salida = new PrintWriter(lista_sockets.get(i).getOutputStream(), true);
-						salida.println(MENSAJE_SALIDA);
+						salida.println(Chat.BROADCAST_MENSAJE_ERROR_SERVIDOR);
 						
 					}catch(IOException ex){
 						
@@ -124,7 +123,7 @@ public class Consola extends JFrame {
 			
 			while(true){
 				
-				//TimeUnit.SECONDS.sleep(1);
+				TimeUnit.SECONDS.sleep(1);
 				socketCliente = socketServidor.accept();
 				agregarAChat(socketCliente);
 				
@@ -135,6 +134,9 @@ public class Consola extends JFrame {
 			//Mensaje de error
 			ex.printStackTrace();
 			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
@@ -144,13 +146,13 @@ public class Consola extends JFrame {
 		try {
 			
 			entrada = new Scanner(socketCliente.getInputStream());
-			nombreUsuario = entrada.nextLine();
+			nickUsuario = entrada.nextLine();
 			
-			if(lista_usuarios.contains(nombreUsuario)){
+			if(lista_usuarios.contains(nickUsuario)){
 				
-				escribirEnConsola("Ya hay un usuario con el nick \"" + nombreUsuario + "\". Intentelo con otro nombre" );
+				escribirEnConsola("Ya hay un usuario con el nick \"" + nickUsuario + "\". Intentelo con otro nombre" );
 				salida = new PrintWriter(socketCliente.getOutputStream(), true);
-				salida.println("6");
+				salida.println(Chat.BROADCAST_MENSAJE_ERROR_USUARIO);
 				socketCliente.close();
 				
 			}
@@ -159,10 +161,10 @@ public class Consola extends JFrame {
 				
 				escribirEnConsola("Agregando usuario nuevo");
 				lista_sockets.add(socketCliente);
-				lista_usuarios.add(nombreUsuario);
-				escribirEnConsola(nombreUsuario + " se ha conectado al char.");
+				lista_usuarios.add(nickUsuario);
+				escribirEnConsola(nickUsuario + " se ha conectado al char.");
 				
-				servicio = new Servicio(nombreUsuario, socketCliente, consola);
+				servicio = new Servicio(nickUsuario, socketCliente, consola);
 				Thread hiloServicio = new Thread(servicio);
 				hiloServicio.start();
 				
