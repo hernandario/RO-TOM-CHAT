@@ -14,9 +14,7 @@ import es.dam.chat.presentacion.Consola;
 public class Servicio implements Runnable {
 
 	private final String IO_ERROR = "Se ha producido un error en la entrada/salida de datos";
-	private final int USUARIO_ABANDONA = 1;
-	private final int USUARIO_ENVIA_MENSAJE = 2;
-	
+
 	private String nickUsuario;
 	private String nickOtroUsuario;
 	private String mensaje;
@@ -43,6 +41,7 @@ public class Servicio implements Runnable {
 		try{
 			salida = new PrintWriter(socketCliente.getOutputStream());
 			entrada = new Scanner(socketCliente.getInputStream());
+			anunciarConexion();
 			
 		}catch(IOException ex){
 			consola.append(IO_ERROR);
@@ -51,11 +50,11 @@ public class Servicio implements Runnable {
 		
 		while(entrada.hasNext()){
 			
-			int opcion = Integer.parseInt(entrada.nextLine());
+			int bcast = Integer.parseInt(entrada.nextLine());
 			
-			switch(opcion){
+			switch(bcast){
 			
-			case USUARIO_ABANDONA:
+			case Broadcast.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS:
 				
 				try {
 					AbandonarChat();
@@ -66,9 +65,10 @@ public class Servicio implements Runnable {
 				
 				break;
 				
-			case USUARIO_ENVIA_MENSAJE:
+			case Broadcast.BROADCAST_MENSAJE_IO:
 				
 				try {
+					System.out.println("El hilo recibe mensaje");
 					enviarMensaje();
 				} catch (IOException ex) {
 					// TODO Auto-generated catch block
@@ -88,6 +88,7 @@ public class Servicio implements Runnable {
 		
 		nickOtroUsuario = entrada.nextLine();
 		mensaje = entrada.nextLine();
+		System.out.println("Servicio: " + mensaje);
 		consola.append(nickOtroUsuario + " ha dicho: " + mensaje); 
 		
 		for(int i = 0; i < Consola.lista_usuarios.size(); i++){
@@ -110,6 +111,9 @@ public class Servicio implements Runnable {
 			
 			otraSalida.println(Broadcast.BROADCAST_MENSAJE_BORRAR_USUARIO);
 			otraSalida.println(nickUsuario);
+			
+			otraSalida.println(Broadcast.BROADCAST_MENSAJE_IO);
+			otraSalida.println(nickUsuario + " se ha deconectado.");
 		
 		}
 		

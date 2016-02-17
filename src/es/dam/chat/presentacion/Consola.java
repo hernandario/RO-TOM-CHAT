@@ -49,6 +49,7 @@ public class Consola extends JFrame {
 		
 		consola.setLineWrap(true);
 		consola.setWrapStyleWord(true);
+		consola.setEditable(false);
 		
 		add(new JScrollPane(consola));
 		setVisible(true);
@@ -119,7 +120,7 @@ public class Consola extends JFrame {
 		try{
 			
 			socketServidor = new ServerSocket(puerto);
-			escribirEnConsola("Esperando");
+			escribirEnConsola("Esperando a que se conecte un usuario...");
 			
 			while(true){
 				
@@ -162,7 +163,7 @@ public class Consola extends JFrame {
 				escribirEnConsola("Agregando usuario nuevo");
 				lista_sockets.add(socketCliente);
 				lista_usuarios.add(nickUsuario);
-				escribirEnConsola(nickUsuario + " se ha conectado al char.");
+				escribirEnConsola(nickUsuario + " se ha conectado al chat.");
 				
 				servicio = new Servicio(nickUsuario, socketCliente, consola);
 				Thread hiloServicio = new Thread(servicio);

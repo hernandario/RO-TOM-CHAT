@@ -42,11 +42,13 @@ public class ChatPresentacion extends JFrame {
 
 	private JPanel panelEnviar;
 	private JPanel panelChat;
+	private JPanel panelTitulo;
 	
 	private static JTextArea taChat;
+	private static JLabel lblTitulo;
+	
 	private JTextField tfMensajes;
 	private JButton btnEnviar;
-	private JLabel lblTitulo;
 	private JLabel lblPista;
 	
 	public static void main(String[] args){
@@ -101,11 +103,18 @@ public class ChatPresentacion extends JFrame {
 		panelEnviar.add(tfMensajes, BorderLayout.CENTER);
 		panelEnviar.add(btnEnviar, BorderLayout.EAST);
 		
+		panelTitulo = new JPanel();
+		panelTitulo.setLayout(new BorderLayout());
+		//TODO menu
+		panelTitulo.add(lblTitulo, BorderLayout.CENTER);
+		
 		panelChat = new JPanel();
 		panelChat.setLayout(new BorderLayout());
-		panelChat.add(lblTitulo, BorderLayout.NORTH);
+		panelChat.add(panelTitulo, BorderLayout.NORTH);
 		panelChat.add(new JScrollPane(taChat), BorderLayout.CENTER);
 		panelChat.add(panelEnviar, BorderLayout.SOUTH);
+		
+		
 		
 		setLayout(new BorderLayout());
 		add(panelChat, BorderLayout.CENTER);
@@ -179,8 +188,11 @@ public class ChatPresentacion extends JFrame {
 		
 		pedirIp();
 		pedirNick();
+		lblTitulo.setText("Hola " + nickUsuario + "\nConectado a: " + ipServidor);
+	
 		
 	}
+	
 	
 	public static void pedirIp(){
 		
@@ -224,11 +236,18 @@ public class ChatPresentacion extends JFrame {
 		
 		if(entrada.hasNext()){
 			
-			switch(Integer.parseInt(entrada.nextLine())){
+			int bcast = Integer.parseInt(entrada.nextLine());
+			
+			switch(bcast){
 			
 			case Broadcast.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS:
 				
 				//TODO: implmentar.
+				String nombreUsuario = entrada.nextLine();
+				if(!lista_usuarios.contains(nombreUsuario)){
+					lista_usuarios.add(nombreUsuario);
+					
+				}
 				
 				break;
 				
@@ -279,9 +298,10 @@ public class ChatPresentacion extends JFrame {
 		
 	}
 	
-	public void actualizarListaUsuarios(){
+	public static void actualizarListaUsuarios(){
 		
 		//TODO
+	
 		
 	}
 	
@@ -318,6 +338,7 @@ public class ChatPresentacion extends JFrame {
 	public void enviarMensaje(){
 		
 		mensaje = tfMensajes.getText();
+		System.out.println(mensaje);
 		
 		if(mensaje.trim().equals(""))
 			JOptionPane.showMessageDialog(null, "No se pueden enviar mensajes vacios","Mensaje vacio",JOptionPane.ERROR_MESSAGE);
@@ -329,7 +350,7 @@ public class ChatPresentacion extends JFrame {
 			salida.println(nickUsuario);
 			//fecha
 			salida.println(mensaje );
-			salida.println("\n");
+			//salida.println("\n");
 			
 		}
 		
