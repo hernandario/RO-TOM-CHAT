@@ -7,7 +7,8 @@ import java.util.Scanner;
 
 import javax.swing.JTextArea;
 
-import es.dam.chat.presentacion.Chat;
+import es.dam.chat.modelo.Broadcast;
+import es.dam.chat.presentacion.ChatPresentacion;
 import es.dam.chat.presentacion.Consola;
 
 public class Servicio implements Runnable {
@@ -93,7 +94,7 @@ public class Servicio implements Runnable {
 			
 			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println(Chat.BROADCAST_MENSAJE_IO);
+			otraSalida.println(Broadcast.BROADCAST_MENSAJE_IO);
 			otraSalida.println(nickOtroUsuario +": " + mensaje);
 			
 		}
@@ -107,7 +108,7 @@ public class Servicio implements Runnable {
 			
 			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println(Chat.BROADCAST_MENSAJE_BORRAR_USUARIO);
+			otraSalida.println(Broadcast.BROADCAST_MENSAJE_BORRAR_USUARIO);
 			otraSalida.println(nickUsuario);
 		
 		}
@@ -127,12 +128,12 @@ public class Servicio implements Runnable {
 			
 			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println(Chat.BROADCAST_MENSAJE_IO);
+			otraSalida.println(Broadcast.BROADCAST_MENSAJE_IO);
 			otraSalida.println(nickUsuario + " se ha conectado.");
 			
 			for(int j = 0; j < Consola.lista_sockets.size(); j++){
 				
-				otraSalida.println(Chat.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS);
+				otraSalida.println(Broadcast.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS);
 				otraSalida.println(Consola.lista_usuarios.get(j));
 				
 			}

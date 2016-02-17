@@ -15,7 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
-import es.dam.chat.modelo.Usuario;
+import es.dam.chat.modelo.Broadcast;
 import es.dam.chat.servicios.Servicio;
 
 public class Consola extends JFrame {
@@ -70,7 +70,7 @@ public class Consola extends JFrame {
 					try{
 						
 						PrintWriter salida = new PrintWriter(lista_sockets.get(i).getOutputStream(), true);
-						salida.println(Chat.BROADCAST_MENSAJE_ERROR_SERVIDOR);
+						salida.println(Broadcast.BROADCAST_MENSAJE_ERROR_SERVIDOR);
 						
 					}catch(IOException ex){
 						
@@ -152,7 +152,7 @@ public class Consola extends JFrame {
 				
 				escribirEnConsola("Ya hay un usuario con el nick \"" + nickUsuario + "\". Intentelo con otro nombre" );
 				salida = new PrintWriter(socketCliente.getOutputStream(), true);
-				salida.println(Chat.BROADCAST_MENSAJE_ERROR_USUARIO);
+				salida.println(Broadcast.BROADCAST_MENSAJE_ERROR_USUARIO);
 				socketCliente.close();
 				
 			}

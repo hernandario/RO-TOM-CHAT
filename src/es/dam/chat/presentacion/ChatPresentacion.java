@@ -23,13 +23,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultCaret;
 
-public class Chat extends JFrame {
+import es.dam.chat.modelo.Broadcast;
+
+public class ChatPresentacion extends JFrame {
 	
-	public static final int BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS = 1;
-	public static final int BROADCAST_MENSAJE_IO = 2;
-	public static final int BROADCAST_MENSAJE_BORRAR_USUARIO = 3;
-	public static final int BROADCAST_MENSAJE_ERROR_SERVIDOR = 4;
-	public static final int BROADCAST_MENSAJE_ERROR_USUARIO = 5;
 	
 	private static String ipServidor;
 	private static int puerto = 1988;
@@ -54,7 +51,7 @@ public class Chat extends JFrame {
 	
 	public static void main(String[] args){
 		
-		Chat c = new Chat();
+		ChatPresentacion c = new ChatPresentacion();
 		iniciarChat();
 		
 		conexion();
@@ -65,7 +62,7 @@ public class Chat extends JFrame {
 		
 	}
 	
-	public Chat(){
+	public ChatPresentacion(){
 		super("RO-TOM CHAT");
 		
 		
@@ -128,7 +125,7 @@ public class Chat extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				
-				salida.println(Chat.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS);
+				salida.println(Broadcast.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS);
 				
 				try{
 					
@@ -229,13 +226,13 @@ public class Chat extends JFrame {
 			
 			switch(Integer.parseInt(entrada.nextLine())){
 			
-			case Chat.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS:
+			case Broadcast.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS:
 				
 				//TODO: implmentar.
 				
 				break;
 				
-			case Chat.BROADCAST_MENSAJE_IO:
+			case Broadcast.BROADCAST_MENSAJE_IO:
 				
 				mensaje = entrada.nextLine();
 				taChat.append(mensaje);
@@ -243,7 +240,7 @@ public class Chat extends JFrame {
 				
 				break;
 				
-			case Chat.BROADCAST_MENSAJE_BORRAR_USUARIO:
+			case Broadcast.BROADCAST_MENSAJE_BORRAR_USUARIO:
 				
 				String usuario = entrada.nextLine();
 				
@@ -252,7 +249,7 @@ public class Chat extends JFrame {
 				
 				break;
 				
-			case Chat.BROADCAST_MENSAJE_ERROR_SERVIDOR:
+			case Broadcast.BROADCAST_MENSAJE_ERROR_SERVIDOR:
 				
 				JOptionPane.showMessageDialog(null, "ERROR: NO ES POSIBLE ENCONTRAR EL SERVIDOR, INTENTELO MÁS TARDE",
 						"Error De Conexión",JOptionPane.ERROR_MESSAGE);
@@ -260,7 +257,7 @@ public class Chat extends JFrame {
 				
 				break;
 				
-			case Chat.BROADCAST_MENSAJE_ERROR_USUARIO:
+			case Broadcast.BROADCAST_MENSAJE_ERROR_USUARIO:
 				
 				try{
 					socketConexion.close();
@@ -328,10 +325,11 @@ public class Chat extends JFrame {
 		else{
 			
 			tfMensajes.setText("");
-			salida.println(Chat.BROADCAST_MENSAJE_IO);
+			salida.println(Broadcast.BROADCAST_MENSAJE_IO);
 			salida.println(nickUsuario);
 			//fecha
-			salida.println(mensaje);
+			salida.println(mensaje );
+			salida.println("\n");
 			
 		}
 		
