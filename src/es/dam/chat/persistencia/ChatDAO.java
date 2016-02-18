@@ -14,7 +14,10 @@ public class ChatDAO {
 	public int insert(Chat chat){
 		
 		sqlStatement = "INSERT INTO "
-				+ Chat.TABLE + " VALUES(?,?)";
+				+ Chat.TABLE 
+				+ "(" + Chat.KEY_IP + ", "
+				+ Chat.KEY_PUERTO + ")"
+				+" VALUES(?,?)";
 		
 		conexion = new ConexionSQL();
 		conexion.abrirConexion(sqlStatement);

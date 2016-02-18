@@ -16,6 +16,8 @@ import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
 import es.dam.chat.modelo.Broadcast;
+import es.dam.chat.modelo.Chat;
+import es.dam.chat.persistencia.ChatDAO;
 import es.dam.chat.servicios.Servicio;
 
 public class Consola extends JFrame {
@@ -29,6 +31,10 @@ public class Consola extends JFrame {
 	private static String nickUsuario;
 	private static int puerto = 1988;
 	private static Servicio servicio;
+	private static int id_chat;
+	
+	private static Chat chat;
+	private static ChatDAO chatDAO;
 	
 	public static ArrayList<Socket> lista_sockets = new ArrayList<Socket>();
 	public static ArrayList<String> lista_usuarios = new ArrayList<String>();
@@ -122,6 +128,11 @@ public class Consola extends JFrame {
 			socketServidor = new ServerSocket(puerto);
 			escribirEnConsola("Esperando a que se conecte un usuario...");
 			
+			chat = new Chat("localhost", puerto);
+			chatDAO = new ChatDAO();
+			
+			id_chat = chatDAO.insert(chat);
+			
 			while(true){
 				
 				TimeUnit.SECONDS.sleep(1);
@@ -165,7 +176,7 @@ public class Consola extends JFrame {
 				lista_usuarios.add(nickUsuario);
 				escribirEnConsola(nickUsuario + " se ha conectado al chat.");
 				
-				servicio = new Servicio(nickUsuario, socketCliente, consola);
+				servicio = new Servicio(nickUsuario, socketCliente, consola, id_chat );
 				Thread hiloServicio = new Thread(servicio);
 				hiloServicio.start();
 				

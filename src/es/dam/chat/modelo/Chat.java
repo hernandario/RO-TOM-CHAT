@@ -13,6 +13,13 @@ public class Chat {
 	private int puerto;
 	
 	
+	
+	
+	public Chat(String ip, int puerto) {
+		super();
+		this.ip = ip;
+		this.puerto = puerto;
+	}
 	public int getId() {
 		return id;
 	}

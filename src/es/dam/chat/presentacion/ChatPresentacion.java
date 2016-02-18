@@ -264,7 +264,7 @@ public class ChatPresentacion extends JFrame {
 				String usuario = entrada.nextLine();
 				
 				lista_usuarios.remove(lista_usuarios.indexOf(usuario));
-				taChat.append(usuario + " ha abandonado el chat");
+				//taChat.append(usuario + " ha abandonado el chat");
 				
 				break;
 				

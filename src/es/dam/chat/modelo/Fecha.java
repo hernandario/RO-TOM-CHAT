@@ -44,6 +44,15 @@ public class Fecha {
 		System.out.println(f.obtenerHora());
 		
 	}
+
+	public Date getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(Date fecha) {
+		this.fecha = fecha;
+	}
+	
 	
 	
 

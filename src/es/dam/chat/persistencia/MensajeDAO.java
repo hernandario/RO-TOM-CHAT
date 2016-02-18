@@ -15,7 +15,12 @@ public class MensajeDAO {
 	public int insert(Mensaje mensaje){
 		
 		sqlStatement = "INSERT INTO "
-				+ Mensaje.TABLE + " VALUES(?, ?, ?, ?)";
+				+ Mensaje.TABLE 
+				+ "(" + Mensaje.KEY_NICK + ", "
+				+ Mensaje.KEY_MENSAJE + ", "
+				+ Mensaje.KEY_FECHA + ", "
+				+ Mensaje.KEY_ID_CHAT +")"
+				+" VALUES(?, ?, ?, ?)";
 		
 		conexion = new ConexionSQL();
 		conexion.abrirConexion(sqlStatement);
@@ -25,7 +30,7 @@ public class MensajeDAO {
 			conexion.sentencia.setString(1, mensaje.getNick());
 			conexion.sentencia.setString(2, mensaje.getMensaje());
 			
-			java.sql.Date fecha = (java.sql.Date) new Date(mensaje.getFecha().getTime());
+			java.sql.Date fecha = (java.sql.Date) new java.sql.Date(mensaje.getFecha().getTime());
 			conexion.sentencia.setDate(3, fecha);
 			
 			conexion.sentencia.setInt(4, mensaje.getId_chat());

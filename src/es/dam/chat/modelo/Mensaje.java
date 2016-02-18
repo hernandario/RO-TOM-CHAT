@@ -1,6 +1,6 @@
 package es.dam.chat.modelo;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class Mensaje {
 	
@@ -17,6 +17,17 @@ public class Mensaje {
 	private String mensaje;
 	private Date fecha;
 	private int id_chat;
+	
+	public Mensaje(String nick, String mensaje, Date fecha, int id_chat){
+		
+		this.nick = nick;
+		this.mensaje = mensaje;
+		this.fecha = fecha;
+		this.id_chat = id_chat;
+		
+	}
+	
+	
 	public int getId() {
 		return id;
 	}

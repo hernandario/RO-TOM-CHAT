@@ -11,7 +11,7 @@ import com.mysql.jdbc.Connection;
 public class ConexionSQL {
 	
 	private String maquina = "localhost";
-	private String bbdd = "ro_to_chat";
+	private String bbdd = "ro_tom_chat";
 	private String usuario = "root";
 	private String pass = "";
 	public static  Connection conexion;
