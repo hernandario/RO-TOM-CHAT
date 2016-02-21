@@ -42,6 +42,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultCaret;
 
 import es.dam.chat.modelo.Broadcast;
+import es.dam.chat.modelo.Chat;
 
 public class ChatPresentacion extends JFrame {
 	
@@ -366,12 +367,18 @@ public class ChatPresentacion extends JFrame {
 				System.exit(0);
 			}
 			
-			if(ip.trim().equals(""))
+			if(ip.trim().equals("")){
 				JOptionPane.showMessageDialog(null, "No puede introducir una IP vacia","IP Vacia",
 						JOptionPane.ERROR_MESSAGE);
+			}
+			
+			if(!Chat.comprobarIP(ip)){
+				JOptionPane.showMessageDialog(null, "introduzca una ip valida (xxx.xxx.xxx.xxx) o intententelo con \"localhost\"","IP Erronea",
+						JOptionPane.ERROR_MESSAGE);
+			}
 			
 		}
-		while(ip.trim().equals(""));
+		while(ip.trim().equals("") || !Chat.comprobarIP(ip));
 		
 		
 		ipServidor = ip;
@@ -389,12 +396,20 @@ public class ChatPresentacion extends JFrame {
 			if(nick == null)
 				System.exit(0);
 			
-			if(nick.trim().equals(""))
+			if(nick.trim().equals("")){
 				JOptionPane.showMessageDialog(null, "No puede introducir un nick vacio","Nick Vacio",
 						JOptionPane.ERROR_MESSAGE);
+
+			}
+			
+			if(!Chat.comprobarNick(nick)){
+				JOptionPane.showMessageDialog(null, "El nick debe tener al menos 3 caracteres alfadecimales","Nick erroneo",
+						JOptionPane.ERROR_MESSAGE);
+
+			}
 			
 		}
-		while(nick.trim().equals(""));
+		while(nick.trim().equals("") || ! Chat.comprobarNick(nick));
 		
 		nickUsuario = nick;
 		
