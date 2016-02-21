@@ -24,7 +24,7 @@ public class Fecha {
 		
 		String horaConFormato ="";
 		
-		return horaConFormato.format("%tl:%tM %tp%n", fecha, fecha, fecha);
+		return horaConFormato.format("%tl:%tM %tp", fecha, fecha, fecha);
 		
 	}
 	
@@ -39,9 +39,10 @@ public class Fecha {
 		
 		Fecha f = new Fecha();
 		
-		System.out.println(f.toString());
-		System.out.println(f.obtenerDia());
-		System.out.println(f.obtenerHora());
+		System.out.print(f.toString());
+		System.out.print(f.obtenerDia());
+		System.out.print(f.obtenerHora());
+		System.out.print(f.obtenerDia());
 		
 	}
 

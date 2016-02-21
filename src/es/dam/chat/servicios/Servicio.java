@@ -20,14 +20,14 @@ public class Servicio implements Runnable {
 	private final String IO_ERROR = "Se ha producido un error en la entrada/salida de datos";
 
 	private String nickUsuario;
-	private String nickOtroUsuario;
+	private String usuarioHilo;
 	private String mensaje;
 	private Socket socketCliente;
 	private JTextArea consola;
 	private Fecha fecha;
 	private int id_chat;
 	
-	private PrintWriter otraSalida;
+	private PrintWriter salidaHilo;
 	private PrintWriter salida;
 	private Scanner entrada;
 	
@@ -98,12 +98,17 @@ public class Servicio implements Runnable {
 		
 		fecha = new Fecha();
 		
-		nickOtroUsuario = entrada.nextLine();
+		
+		
+		usuarioHilo = entrada.nextLine();
 		mensaje = entrada.nextLine();
 		System.out.println("Servicio: " + mensaje);
-		consola.append(nickOtroUsuario + " ha dicho: " + mensaje + " a las: " + fecha.obtenerHora());
 		
-		objMensaje = new Mensaje(nickOtroUsuario, mensaje, fecha.getFecha(), id_chat);
+		String cola = usuarioHilo + " ha dicho (" + fecha.obtenerHora() + "): ";
+		
+		consola.append(cola + mensaje);
+		
+		objMensaje = new Mensaje(usuarioHilo, mensaje, fecha.getFecha(), id_chat);
 		
 		mensajeDAO = new MensajeDAO();
 		
@@ -112,10 +117,14 @@ public class Servicio implements Runnable {
 		
 		for(int i = 0; i < Consola.lista_usuarios.size(); i++){
 			
-			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println(Broadcast.BROADCAST_MENSAJE_IO);
-			otraSalida.println(nickOtroUsuario +": " + mensaje);
+			if(!Consola.lista_usuarios.get(i).equals(usuarioHilo)){
+			
+				salidaHilo = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
+				
+				salidaHilo.println(Broadcast.BROADCAST_MENSAJE_IO);
+				salidaHilo.println(cola + mensaje);
+			}
 			
 		}
 		
@@ -126,13 +135,13 @@ public class Servicio implements Runnable {
 		
 		for(int i = 0; i < Consola.lista_sockets.size(); i++){
 			
-			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
+			salidaHilo = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println(Broadcast.BROADCAST_MENSAJE_BORRAR_USUARIO);
-			otraSalida.println(nickUsuario);
+			salidaHilo.println(Broadcast.BROADCAST_MENSAJE_BORRAR_USUARIO);
+			salidaHilo.println(nickUsuario);
 			
-			otraSalida.println(Broadcast.BROADCAST_MENSAJE_IO);
-			otraSalida.println(nickUsuario + " se ha deconectado.");
+			salidaHilo.println(Broadcast.BROADCAST_MENSAJE_IO);
+			salidaHilo.println(nickUsuario + " se ha deconectado.");
 		
 		}
 		
@@ -148,17 +157,17 @@ public class Servicio implements Runnable {
 		
 		for(int i = 0; i < Consola.lista_sockets.size(); i++){
 			
-			otraSalida = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
+			salidaHilo = new PrintWriter(Consola.lista_sockets.get(i).getOutputStream(), true);
 			
-			otraSalida.println(Broadcast.BROADCAST_MENSAJE_IO);
-			otraSalida.println(nickUsuario + " se ha conectado.");
+			salidaHilo.println(Broadcast.BROADCAST_MENSAJE_IO);
+			salidaHilo.println(nickUsuario + " se ha conectado.");
 			
 			
 			
 			for(int j = 0; j < Consola.lista_sockets.size(); j++){
 				
-				otraSalida.println(Broadcast.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS);
-				otraSalida.println(Consola.lista_usuarios.get(j));
+				salidaHilo.println(Broadcast.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS);
+				salidaHilo.println(Consola.lista_usuarios.get(j));
 				
 			}
 		}

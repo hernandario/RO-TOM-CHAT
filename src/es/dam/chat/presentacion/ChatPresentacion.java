@@ -2,6 +2,7 @@ package es.dam.chat.presentacion;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -13,43 +14,68 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.swing.AbstractListModel;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultCaret;
 
 import es.dam.chat.modelo.Broadcast;
 
 public class ChatPresentacion extends JFrame {
 	
+	private static final int THEME_USABILICHAT = 1;
+	private static final int THEME_WHACHAT = 2;
 	
+	private static Socket socketConexion;
 	private static String ipServidor;
 	private static int puerto = 1988;
-	private static Socket socketConexion;
 	
 	private static PrintWriter salida;
 	private static Scanner entrada;
-	
+
+	private static String numeroUsuariosConectados = "Usuarios conectados ( )";
 	private static String nickUsuario;
 	private static String mensaje;
 	
 	public static ArrayList<String> lista_usuarios = new ArrayList<String>();
 
-	private JPanel panelEnviar;
-	private JPanel panelChat;
-	private JPanel panelTitulo;
+	private static JTabbedPane panelTabs;
 	
+	private JPanel panelLista_usuarios;
+	private JPanel panelEnviar;
+	private JPanel panelTitulo;
+	private JPanel panelChat;
+	
+	private static JList jlLista_usuarios;
+	private static JTextField tfMensajes;
+	private static JButton btnEnviar;
 	private static JTextArea taChat;
 	private static JLabel lblTitulo;
+	private static JLabel lblPista;
 	
-	private JTextField tfMensajes;
-	private JButton btnEnviar;
-	private JLabel lblPista;
+	private JRadioButtonMenuItem rbmiUsabilichat;
+	private JRadioButtonMenuItem rbmiWhachat; 
+	
+	
+	private JMenuItem miSalir;
+	private JMenuBar menuBar;
+	private JMenu menu;
 	
 	public static void main(String[] args){
 		
@@ -57,6 +83,8 @@ public class ChatPresentacion extends JFrame {
 		iniciarChat();
 		
 		conexion();
+		
+		
 		
 		while(true){
 			broadCastReceiver();
@@ -67,6 +95,73 @@ public class ChatPresentacion extends JFrame {
 	public ChatPresentacion(){
 		super("RO-TOM CHAT");
 		
+		menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		menu = new JMenu("Opciones");
+		menuBar.add(menu);
+		
+		ButtonGroup bgTemas = new ButtonGroup();
+		
+		rbmiWhachat = new JRadioButtonMenuItem("Whachat");
+		bgTemas.add(rbmiWhachat);
+		menu.add(rbmiWhachat);
+		
+		rbmiUsabilichat = new JRadioButtonMenuItem("Usabilichat");
+		bgTemas.add(rbmiUsabilichat);
+		menu.add(rbmiUsabilichat);
+		
+		menu.addSeparator();
+		
+		miSalir = new JMenuItem("Salir");
+		menu.add(miSalir);
+		
+		miSalir.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				System.exit(0);
+			}
+			
+		});
+		
+		rbmiWhachat.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				cambiarTema(THEME_WHACHAT);
+				
+			}
+			
+		});
+		
+		/*
+		rbmiWhachat.addChangeListener(new ChangeListener(){
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				cambiarTema(THEME_WHACHAT);
+			}
+			
+		});
+		*/
+		
+		rbmiUsabilichat.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				cambiarTema(THEME_USABILICHAT);
+				
+			}
+			
+		});
+		
+		
+		rbmiWhachat.setSelected(true);
 		
 		lblTitulo = new JLabel();
 		lblPista = new JLabel("Escribe aquí un mensaje...");
@@ -83,6 +178,8 @@ public class ChatPresentacion extends JFrame {
 		tfMensajes = new JTextField(30);
 		tfMensajes.requestFocus();
 		
+		jlLista_usuarios = new JList();
+		
 		btnEnviar = new JButton("ENVIAR");
 		btnEnviar.addActionListener(new ActionListener(){
 
@@ -96,6 +193,7 @@ public class ChatPresentacion extends JFrame {
 			
 		});
 		
+		panelTabs = new JTabbedPane();
 		
 		panelEnviar = new JPanel();
 		panelEnviar.setLayout(new BorderLayout());
@@ -110,17 +208,24 @@ public class ChatPresentacion extends JFrame {
 		
 		panelChat = new JPanel();
 		panelChat.setLayout(new BorderLayout());
-		panelChat.add(panelTitulo, BorderLayout.NORTH);
+		//panelChat.add(panelTitulo, BorderLayout.NORTH);
 		panelChat.add(new JScrollPane(taChat), BorderLayout.CENTER);
 		panelChat.add(panelEnviar, BorderLayout.SOUTH);
 		
+		panelLista_usuarios = new JPanel();
+		panelLista_usuarios.setLayout(new BorderLayout());
+		panelLista_usuarios.add(jlLista_usuarios, BorderLayout.CENTER);
+		
+		panelTabs.add("Conversacion", panelChat);
+		panelTabs.add(numeroUsuariosConectados, panelLista_usuarios);
 		
 		
 		setLayout(new BorderLayout());
-		add(panelChat, BorderLayout.CENTER);
+		add(panelTitulo, BorderLayout.NORTH);
+		add(panelTabs, BorderLayout.CENTER);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(400, 900);
+		setSize(400, 720);
 		setLocationRelativeTo(null);
 		
 		addWindowListener(new WindowListener(){
@@ -139,7 +244,6 @@ public class ChatPresentacion extends JFrame {
 				try{
 					
 					socketConexion.close();
-					System.exit(0);
 					
 				}catch(IOException ex){
 					
@@ -147,6 +251,11 @@ public class ChatPresentacion extends JFrame {
 					ex.printStackTrace();
 					
 				}
+				finally{
+					System.exit(0);
+				}
+				
+				
 				
 			}
 
@@ -209,6 +318,7 @@ public class ChatPresentacion extends JFrame {
 		}
 		while(ip.trim().equals(""));
 		
+		
 		ipServidor = ip;
 		
 	}
@@ -245,7 +355,10 @@ public class ChatPresentacion extends JFrame {
 				//TODO: implmentar.
 				String nombreUsuario = entrada.nextLine();
 				if(!lista_usuarios.contains(nombreUsuario)){
+					
 					lista_usuarios.add(nombreUsuario);
+
+					actualizarListaUsuarios();
 					
 				}
 				
@@ -254,8 +367,11 @@ public class ChatPresentacion extends JFrame {
 			case Broadcast.BROADCAST_MENSAJE_IO:
 				
 				mensaje = entrada.nextLine();
+				taChat.append("\n");
 				taChat.append(mensaje);
 				taChat.append("\n");
+				
+				
 				
 				break;
 				
@@ -265,6 +381,7 @@ public class ChatPresentacion extends JFrame {
 				
 				lista_usuarios.remove(lista_usuarios.indexOf(usuario));
 				//taChat.append(usuario + " ha abandonado el chat");
+				actualizarListaUsuarios();
 				
 				break;
 				
@@ -288,6 +405,7 @@ public class ChatPresentacion extends JFrame {
 				}
 				
 				JOptionPane.showMessageDialog(null, "ERROR: Ese nick ya se está utilizando","Nick En Uso",JOptionPane.ERROR_MESSAGE);
+				System.exit(0);
 				
 				break;
 			
@@ -298,9 +416,78 @@ public class ChatPresentacion extends JFrame {
 		
 	}
 	
+	public static void cambiarTema(int tema){
+		
+		Font fuenteUsabilichat = new Font("Fuente usable", Font.BOLD, 20);
+		//Font fuenteWhachat = new Font();
+		
+		if(tema == THEME_WHACHAT){
+			
+			System.out.println("whachat");
+			
+						
+		}
+		
+		if(tema == THEME_USABILICHAT){
+			
+			System.out.println("usabilichat");
+			jlLista_usuarios.setBackground(Color.BLACK);
+			jlLista_usuarios.setFont(fuenteUsabilichat);
+			jlLista_usuarios.setForeground(Color.WHITE);
+			
+			taChat.setBackground(Color.BLACK);
+			taChat.setFont(fuenteUsabilichat);
+			taChat.setForeground(Color.WHITE);
+			
+			tfMensajes.setBackground(Color.BLACK);
+			tfMensajes.setFont(fuenteUsabilichat);
+			tfMensajes.setForeground(Color.WHITE);
+			
+			lblPista.setFont(fuenteUsabilichat);
+			lblPista.setForeground(Color.BLUE);
+
+		}
+		
+	}
+	
 	public static void actualizarListaUsuarios(){
 		
-		//TODO
+		
+		numeroUsuariosConectados = "Usuarios conectados (" + lista_usuarios.size() +")";
+		panelTabs.setTitleAt(1, numeroUsuariosConectados);
+		
+		
+		for(int i = 0; i < lista_usuarios.size(); i++){
+			
+			SwingUtilities.invokeLater(new Runnable(){
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					
+					jlLista_usuarios.setModel(new AbstractListModel(){
+
+						@Override
+						public int getSize() {
+							// TODO Auto-generated method stub
+							return lista_usuarios.size();
+						}
+
+						@Override
+						public Object getElementAt(int index) {
+							// TODO Auto-generated method stub
+							return lista_usuarios.get(index);
+						}
+						
+					});
+					
+				}
+				
+			});
+			
+			
+			
+		}
 	
 		
 	}
@@ -344,6 +531,15 @@ public class ChatPresentacion extends JFrame {
 			JOptionPane.showMessageDialog(null, "No se pueden enviar mensajes vacios","Mensaje vacio",JOptionPane.ERROR_MESSAGE);
 		
 		else{
+			
+			//TODO que lo que escriba el usuario aparezca a la derecha
+			
+			JTextField tfMensaje = new JTextField(mensaje);
+			
+			taChat.append("\n");
+			taChat.append("yo: " + mensaje);
+			taChat.append("\n");
+			
 			
 			tfMensajes.setText("");
 			salida.println(Broadcast.BROADCAST_MENSAJE_IO);
