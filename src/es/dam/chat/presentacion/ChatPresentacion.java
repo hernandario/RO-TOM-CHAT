@@ -2,11 +2,14 @@ package es.dam.chat.presentacion;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -14,8 +17,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -64,10 +70,14 @@ public class ChatPresentacion extends JFrame {
 	
 	private static JList jlLista_usuarios;
 	private static JTextField tfMensajes;
+	private static JLabel lblNickUsuario;
 	private static JButton btnEnviar;
 	private static JTextArea taChat;
-	private static JLabel lblTitulo;
+	private static JLabel lblIp;
 	private static JLabel lblPista;
+	
+	private BufferedImage biUsuario;
+	private JLabel lblImagenUsuario;
 	
 	private JRadioButtonMenuItem rbmiUsabilichat;
 	private JRadioButtonMenuItem rbmiWhachat; 
@@ -163,8 +173,19 @@ public class ChatPresentacion extends JFrame {
 		
 		rbmiWhachat.setSelected(true);
 		
-		lblTitulo = new JLabel();
+		lblNickUsuario = new JLabel();
+		lblIp = new JLabel();
 		lblPista = new JLabel("Escribe aquí un mensaje...");
+		
+		try {
+			biUsuario = ImageIO.read(new File("." + File.separator + "img" + File.separator + "user.png"));
+			lblImagenUsuario = new JLabel(new ImageIcon(biUsuario));
+			
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
 		
 		taChat = new JTextArea();
 		taChat.setColumns(25);
@@ -177,10 +198,34 @@ public class ChatPresentacion extends JFrame {
 		
 		tfMensajes = new JTextField(30);
 		tfMensajes.requestFocus();
+		tfMensajes.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				enviarMensaje();
+			}
+			
+		});
 		
 		jlLista_usuarios = new JList();
+		try {
+			
+			File f = new File("." + File.separator + "img" + File.separator+ "send.jpg");
+			
+			BufferedImage biEnviar = ImageIO.read(f);
 		
-		btnEnviar = new JButton("ENVIAR");
+			btnEnviar = new JButton(new ImageIcon(biEnviar));
+			btnEnviar.setBorder(BorderFactory.createEmptyBorder());
+			btnEnviar.setContentAreaFilled(false);
+			btnEnviar.setBounds(350, 10, 50, 25);
+			
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 		btnEnviar.addActionListener(new ActionListener(){
 
 			@Override
@@ -203,8 +248,13 @@ public class ChatPresentacion extends JFrame {
 		
 		panelTitulo = new JPanel();
 		panelTitulo.setLayout(new BorderLayout());
-		//TODO menu
-		panelTitulo.add(lblTitulo, BorderLayout.CENTER);
+		JPanel flowPanel = new JPanel();
+		flowPanel.setLayout(new FlowLayout());
+		flowPanel.add(lblNickUsuario);
+		flowPanel.add(lblIp);
+		panelTitulo.add(lblImagenUsuario, BorderLayout.WEST);
+		panelTitulo.add(flowPanel, BorderLayout.CENTER);
+		
 		
 		panelChat = new JPanel();
 		panelChat.setLayout(new BorderLayout());
@@ -297,7 +347,8 @@ public class ChatPresentacion extends JFrame {
 		
 		pedirIp();
 		pedirNick();
-		lblTitulo.setText("Hola " + nickUsuario + "\nConectado a: " + ipServidor);
+		lblNickUsuario.setText("Hola " + nickUsuario); 
+		lblIp.setText("\tEstas conectado onectado a: " + ipServidor);
 	
 		
 	}
@@ -310,6 +361,10 @@ public class ChatPresentacion extends JFrame {
 		do{
 			
 			ip = JOptionPane.showInputDialog("Introduzca la IP del servidor al que se quiere conectar: ");
+			
+			if(ip == null){
+				System.exit(0);
+			}
 			
 			if(ip.trim().equals(""))
 				JOptionPane.showMessageDialog(null, "No puede introducir una IP vacia","IP Vacia",
@@ -330,6 +385,9 @@ public class ChatPresentacion extends JFrame {
 		do{
 			
 			nick = JOptionPane.showInputDialog("Introduzca su nick:");
+			
+			if(nick == null)
+				System.exit(0);
 			
 			if(nick.trim().equals(""))
 				JOptionPane.showMessageDialog(null, "No puede introducir un nick vacio","Nick Vacio",
@@ -419,11 +477,31 @@ public class ChatPresentacion extends JFrame {
 	public static void cambiarTema(int tema){
 		
 		Font fuenteUsabilichat = new Font("Fuente usable", Font.BOLD, 20);
-		//Font fuenteWhachat = new Font();
+		Font fuenteWhachat = new Font("Fuente chat", Font.PLAIN, 14);
 		
 		if(tema == THEME_WHACHAT){
 			
 			System.out.println("whachat");
+			jlLista_usuarios.setBackground(Color.WHITE);
+			jlLista_usuarios.setFont(fuenteWhachat);
+			jlLista_usuarios.setForeground(Color.BLACK);
+			
+			taChat.setBackground(Color.WHITE);
+			taChat.setFont(fuenteWhachat);
+			taChat.setForeground(Color.BLACK);
+			
+			tfMensajes.setBackground(Color.WHITE);
+			tfMensajes.setFont(fuenteWhachat);
+			tfMensajes.setForeground(Color.BLACK);
+			
+			lblPista.setFont(fuenteWhachat);
+			lblPista.setForeground(Color.BLACK);
+			
+			lblNickUsuario.setFont(fuenteWhachat);
+			lblNickUsuario.setForeground(Color.BLACK);
+			
+			lblIp.setFont(fuenteWhachat);
+			lblIp.setForeground(Color.BLACK);
 			
 						
 		}
@@ -445,6 +523,12 @@ public class ChatPresentacion extends JFrame {
 			
 			lblPista.setFont(fuenteUsabilichat);
 			lblPista.setForeground(Color.BLUE);
+			
+			lblNickUsuario.setFont(fuenteUsabilichat);
+			lblNickUsuario.setForeground(Color.BLUE);
+			
+			lblIp.setFont(fuenteUsabilichat);
+			lblIp.setForeground(Color.BLUE);
 
 		}
 		
@@ -506,6 +590,7 @@ public class ChatPresentacion extends JFrame {
 			
 			//Mensaje de error
 			ex.printStackTrace();
+			System.exit(0);
 			
 		} catch (IOException ex) {
 			
