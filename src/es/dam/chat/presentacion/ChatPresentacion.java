@@ -44,6 +44,13 @@ import javax.swing.text.DefaultCaret;
 import es.dam.chat.modelo.Broadcast;
 import es.dam.chat.modelo.Chat;
 
+/**
+ * Esta clase es la encargada de gestionar la GUI del chat así.
+ * 
+ * @author Hernan Darío Villamil y Elizabeth Gordon
+ * @version 1.0
+ * @since 21/02/2016
+ */
 public class ChatPresentacion extends JFrame {
 	
 	private static final int THEME_USABILICHAT = 1;
@@ -94,15 +101,18 @@ public class ChatPresentacion extends JFrame {
 		iniciarChat();
 		
 		conexion();
-		
-		
-		
+
 		while(true){
 			broadCastReceiver();
 		}
 		
 	}
 	
+	/**
+	 * Constructor que inicializa la GUI del chat
+	 * 
+	 * @exception IOException si no se puede acceder a los archivos de las imagenes
+	 */
 	public ChatPresentacion(){
 		super("RO-TOM CHAT");
 		
@@ -344,34 +354,42 @@ public class ChatPresentacion extends JFrame {
 		
 	}
 
+	/**
+	 * Metodo que pide la información necesaria al usuario (nick e ip)
+	 */
 	public static void iniciarChat(){
 		
 		pedirIp();
 		pedirNick();
 		lblNickUsuario.setText("Hola " + nickUsuario); 
-		lblIp.setText("\tEstas conectado onectado a: " + ipServidor);
+		lblIp.setText("\tEstas conectado a: " + ipServidor);
 	
 		
 	}
 	
-	
+	/**
+	 * Metodo que pide la IP del servidor al usuario
+	 */
 	public static void pedirIp(){
 		
 		String ip = "";
 		
+		//Se pide la ip al usuario hasta que la introduzca correctamente o haga clcik en cnacelar
 		do{
 			
 			ip = JOptionPane.showInputDialog("Introduzca la IP del servidor al que se quiere conectar: ");
 			
 			if(ip == null){
-				System.exit(0);
+				System.exit(0); //Si hace clik en cancelar, se cierra el programa
 			}
 			
+			//Si la ip está vacia se informa al usuario
 			if(ip.trim().equals("")){
 				JOptionPane.showMessageDialog(null, "No puede introducir una IP vacia","IP Vacia",
 						JOptionPane.ERROR_MESSAGE);
 			}
 			
+			//Si la ip no tiene el formato adecuado se informa al usuario
 			if(!Chat.comprobarIP(ip)){
 				JOptionPane.showMessageDialog(null, "introduzca una ip valida (xxx.xxx.xxx.xxx) o intententelo con \"localhost\"","IP Erronea",
 						JOptionPane.ERROR_MESSAGE);
@@ -385,23 +403,29 @@ public class ChatPresentacion extends JFrame {
 		
 	}
 	
+	/**
+	 * Metodo que pide el nick al usuario
+	 */
 	public static void pedirNick(){
 		
 		String nick = "";
 		
+		//Se pide el nick ak usuario hasta que introduzca uno correcto o haga click en cancelar
 		do{
 			
 			nick = JOptionPane.showInputDialog("Introduzca su nick:");
 			
 			if(nick == null)
-				System.exit(0);
+				System.exit(0); //Si hace clik en cancelar, se cierra el programa
 			
+			//Si el nick está vacio se informa al usuario
 			if(nick.trim().equals("")){
 				JOptionPane.showMessageDialog(null, "No puede introducir un nick vacio","Nick Vacio",
 						JOptionPane.ERROR_MESSAGE);
 
 			}
 			
+			//Si el nick no tiene el formato adecuado se informa al usuario
 			if(!Chat.comprobarNick(nick)){
 				JOptionPane.showMessageDialog(null, "El nick debe tener al menos 3 caracteres alfadecimales","Nick erroneo",
 						JOptionPane.ERROR_MESSAGE);
@@ -415,15 +439,20 @@ public class ChatPresentacion extends JFrame {
 		
 	}
 	
+	/**
+	 * Metodo que controla que tipo de acción debe ejecutar el chat cada vez que el servidor le envia un mensaje
+	 * 
+	 * @exception IOException si existe algún problema con la lectura de los mensajes BROADCAST
+	 */
 	public static void broadCastReceiver(){
 		
 		if(entrada.hasNext()){
 			
-			int bcast = Integer.parseInt(entrada.nextLine());
+			int bcast = Integer.parseInt(entrada.nextLine()); //La primer linea es un broadcast de tipo entero
 			
 			switch(bcast){
 			
-			case Broadcast.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS:
+			case Broadcast.BROADCAST_MENSAJE_ACTUALIZAR_LISTA_USUARIOS: //En este caso se actualiza la lista de usuarios
 				
 				//TODO: implmentar.
 				String nombreUsuario = entrada.nextLine();
@@ -437,7 +466,7 @@ public class ChatPresentacion extends JFrame {
 				
 				break;
 				
-			case Broadcast.BROADCAST_MENSAJE_IO:
+			case Broadcast.BROADCAST_MENSAJE_IO: //En este caso se escribe el mensaje enviado por otro cliente
 				
 				mensaje = entrada.nextLine();
 				taChat.append("\n");
@@ -448,7 +477,7 @@ public class ChatPresentacion extends JFrame {
 				
 				break;
 				
-			case Broadcast.BROADCAST_MENSAJE_BORRAR_USUARIO:
+			case Broadcast.BROADCAST_MENSAJE_BORRAR_USUARIO: //Se actualiza la lista de usuarios y se informa de que un cliente ha abandonado el chat
 				
 				String usuario = entrada.nextLine();
 				
@@ -458,7 +487,7 @@ public class ChatPresentacion extends JFrame {
 				
 				break;
 				
-			case Broadcast.BROADCAST_MENSAJE_ERROR_SERVIDOR:
+			case Broadcast.BROADCAST_MENSAJE_ERROR_SERVIDOR: //Se cierra la palicación despues de informar que existe un problema con el servidor
 				
 				JOptionPane.showMessageDialog(null, "ERROR: NO ES POSIBLE ENCONTRAR EL SERVIDOR, INTENTELO MÁS TARDE",
 						"Error De Conexión",JOptionPane.ERROR_MESSAGE);
@@ -466,7 +495,7 @@ public class ChatPresentacion extends JFrame {
 				
 				break;
 				
-			case Broadcast.BROADCAST_MENSAJE_ERROR_USUARIO:
+			case Broadcast.BROADCAST_MENSAJE_ERROR_USUARIO: //el usuario no puede conectarse con el servidor porque ya hay otro usuario con el mismo nick
 				
 				try{
 					socketConexion.close();
@@ -489,11 +518,17 @@ public class ChatPresentacion extends JFrame {
 		
 	}
 	
+	/**
+	 * Metodo para cambiar el aspecto del chat
+	 * 
+	 * @param tema Entero que corresponde al tema elegido
+	 */
 	public static void cambiarTema(int tema){
 		
 		Font fuenteUsabilichat = new Font("Fuente usable", Font.BOLD, 20);
 		Font fuenteWhachat = new Font("Fuente chat", Font.PLAIN, 14);
 		
+		//El tema Whachat es el basico (Fondos blancos, letras negras)
 		if(tema == THEME_WHACHAT){
 			
 			System.out.println("whachat");
@@ -521,6 +556,7 @@ public class ChatPresentacion extends JFrame {
 						
 		}
 		
+		//El tema Usabilichat está pensado para usuarios con problemas de vision (Fondos negros, letras blancas y grandes)
 		if(tema == THEME_USABILICHAT){
 			
 			System.out.println("usabilichat");
@@ -549,13 +585,16 @@ public class ChatPresentacion extends JFrame {
 		
 	}
 	
+	/**
+	 * Metodo que actualiza la JList con los usuarios conectados la servidor
+	 */
 	public static void actualizarListaUsuarios(){
 		
-		
+		//Se actualiza al titulo de la pestaña de usuarios conectados
 		numeroUsuariosConectados = "Usuarios conectados (" + lista_usuarios.size() +")";
 		panelTabs.setTitleAt(1, numeroUsuariosConectados);
 		
-		
+		//Se actualiza la información de la JList jlLista_usuarios
 		for(int i = 0; i < lista_usuarios.size(); i++){
 			
 			SwingUtilities.invokeLater(new Runnable(){
@@ -591,23 +630,25 @@ public class ChatPresentacion extends JFrame {
 		
 	}
 	
+	/**
+	 * Metodo que inicia la conexión entre el cliente y el servidor
+	 * 
+	 * @exception IOException si existe algún problema con el servidor
+	 */
 	public static void conexion(){
 		
+		
 		try{
-			
+			//Se abre la conexión con el servidor
 			socketConexion = new Socket(ipServidor, puerto);
 			
+			//Se crea una entrada y una salida de información entre el cliente y el servidor
 			salida = new PrintWriter(socketConexion.getOutputStream(), true);
 			entrada = new Scanner(socketConexion.getInputStream());
-			salida.println(nickUsuario);
 			
-		}catch(UnknownHostException ex){
+			salida.println(nickUsuario); //Se envia el nick del usuario para informar a los demás clientes de su conexión
 			
-			//Mensaje de error
-			ex.printStackTrace();
-			System.exit(0);
-			
-		} catch (IOException ex) {
+		}catch (IOException ex) {
 			
 			JOptionPane.showMessageDialog(null, ("ERROR:NO HAY NINGÚN SERVIDOR EJECUTANDOSE EN LA IP: " + ipServidor + "."),
 					"Error de conexión",JOptionPane.ERROR_MESSAGE);
@@ -618,35 +659,38 @@ public class ChatPresentacion extends JFrame {
 		
 	}
 	
-	public static void mostrarMensaje(String linea){
-		//TODO
-	}
 	
+	/**
+	 * 
+	 * Metodo encargado de enviar el mensaje que ha escrito el usuario
+	 */
 	public void enviarMensaje(){
 		
-		mensaje = tfMensajes.getText();
-		System.out.println(mensaje);
+		mensaje = tfMensajes.getText();//Se recoje el mensaje
 		
+		//Si el mensaje está vacio se informa al usuario
 		if(mensaje.trim().equals(""))
 			JOptionPane.showMessageDialog(null, "No se pueden enviar mensajes vacios","Mensaje vacio",JOptionPane.ERROR_MESSAGE);
+		
 		
 		else{
 			
 			//TODO que lo que escriba el usuario aparezca a la derecha
 			
-			JTextField tfMensaje = new JTextField(mensaje);
+			//JTextField tfMensaje = new JTextField(mensaje);
 			
+			//Se escribe el mensaje en la JTextArea
 			taChat.append("\n");
 			taChat.append("yo: " + mensaje);
 			taChat.append("\n");
 			
 			
+			//Se manda el mensaje al servidor informadole que se trata de un mensaje
 			tfMensajes.setText("");
 			salida.println(Broadcast.BROADCAST_MENSAJE_IO);
 			salida.println(nickUsuario);
-			//fecha
 			salida.println(mensaje );
-			//salida.println("\n");
+		
 			
 		}
 		

@@ -20,6 +20,13 @@ import es.dam.chat.modelo.Chat;
 import es.dam.chat.persistencia.ChatDAO;
 import es.dam.chat.servicios.Servicio;
 
+/**
+ *Esta clase es la encargada de gestionar El servidor al que se conectaran los clientes.
+ * 
+ * @author Hernan Darío Villamil y Elizabeth Gordon
+ * @version 1.0
+ * @since 21/02/2016
+ */
 public class Consola extends JFrame {
 	
 	
@@ -46,9 +53,14 @@ public class Consola extends JFrame {
 		
 	}
 	
+	/**
+	 * Constructor que inicializa la GUI del servidor
+	 * 
+	 * @exception IOException si existe algún problema con la lectura de los mensajes BROADCAST
+	 */
 	public Consola(){
 		
-		super("CONSOLA");
+		super("CONSOLA"); 
 		consola = new JTextArea(">...");
 		DefaultCaret caret = (DefaultCaret) consola.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -63,6 +75,7 @@ public class Consola extends JFrame {
 		setSize(400, 400);
 		setLocationRelativeTo(null);
 		
+		
 		addWindowListener(new WindowListener(){
 
 			@Override
@@ -71,13 +84,16 @@ public class Consola extends JFrame {
 				
 			}
 
-			@Override
+			/**
+			 *@param e indica el tipo de evento. 
+			 *@Override
+			*/
 			public void windowClosing(WindowEvent e) {
 				for( int i = 0; i < lista_sockets.size(); i++){
 					try{
-						
+						//Se envia un mensaje de error a todos los clientes para informarles que no pueden conectarse al servidor
 						PrintWriter salida = new PrintWriter(lista_sockets.get(i).getOutputStream(), true);
-						salida.println(Broadcast.BROADCAST_MENSAJE_ERROR_SERVIDOR);
+						salida.println(Broadcast.BROADCAST_MENSAJE_ERROR_SERVIDOR); 
 						
 					}catch(IOException ex){
 						
@@ -121,20 +137,27 @@ public class Consola extends JFrame {
 
 	}
 	
+	/**
+	 * Este etodo inicia la ejecución del servidor
+	 * 
+	 * @exception IOException si existe algún problema con la lectura de los mensajes BROADCAST
+	 * @exception InterrumptedException Si la ejecucíon del servidor falla
+	 */
 	public static void ejecutarServidor(){
 		
 		try{
 			
-			socketServidor = new ServerSocket(puerto);
+			socketServidor = new ServerSocket(puerto); //Se inicializa el nuevo ServerSocket
 			escribirEnConsola("Esperando a que se conecte un usuario...");
 			
-			chat = new Chat("localhost", puerto);
-			chatDAO = new ChatDAO();
+			chat = new Chat("localhost", puerto); //Nuevo objeto de tipo Chat
+			chatDAO = new ChatDAO(); //Nuevo objeto de tipo ChatDAO
 			
-			id_chat = chatDAO.insert(chat);
+			id_chat = chatDAO.insert(chat); //Llamada al metodo inset de la clase ChatDAO
+			
 			
 			while(true){
-				
+				//Si se detectan nuevos cleintes se añaden al chat
 				TimeUnit.SECONDS.sleep(1);
 				socketCliente = socketServidor.accept();
 				agregarAChat(socketCliente);
@@ -152,14 +175,21 @@ public class Consola extends JFrame {
 		}
 	}
 	
-	
+	/**
+	 * Metodo que añade los clientes al chat
+	 * 
+	 * @param socketCliente
+	 * @exception IOException si existe algún problema con la lectura de los mensajes BROADCAST
+	 */
 	public static void agregarAChat(Socket socketCliente){
 		
 		try {
 			
-			entrada = new Scanner(socketCliente.getInputStream());
-			nickUsuario = entrada.nextLine();
 			
+			entrada = new Scanner(socketCliente.getInputStream()); //Se abre un inputStream con el cliente para recoger la información
+			nickUsuario = entrada.nextLine(); //Se recoge el nick enviado por el usuaio
+			
+			//Si el nick ya existe no se añde y se informa al usaurio
 			if(lista_usuarios.contains(nickUsuario)){
 				
 				escribirEnConsola("Ya hay un usuario con el nick \"" + nickUsuario + "\". Intentelo con otro nombre" );
@@ -169,6 +199,7 @@ public class Consola extends JFrame {
 				
 			}
 			
+			//Si el nick aún n existe se ñade a la lista de usaurios y el socket se guarda tambien.
 			else{
 				
 				escribirEnConsola("Agregando usuario nuevo");
@@ -189,6 +220,11 @@ public class Consola extends JFrame {
 		
 	}
 	
+	/**
+	 * Este metodo escribe en la consola la información.
+	 * 
+	 * @param linea String con la inforamación que se va a agregar a la consola.
+	 */
 	public static void escribirEnConsola(String linea){
 		
 		consola.append(linea);

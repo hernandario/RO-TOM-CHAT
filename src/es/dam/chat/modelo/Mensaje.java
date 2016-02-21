@@ -2,6 +2,11 @@ package es.dam.chat.modelo;
 
 import java.util.Date;
 
+/**
+ * @author Hernán Darío Villamil y Elizabeth Gordon
+ * @version 1.0
+ * @since 21/02/2016
+ */
 public class Mensaje {
 	
 	public static final String TABLE = "mensaje";
