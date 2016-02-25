@@ -11,6 +11,7 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
@@ -148,12 +149,24 @@ public class Consola extends JFrame {
 		try{
 			
 			socketServidor = new ServerSocket(puerto); //Se inicializa el nuevo ServerSocket
+			//escribirEnConsola(String.valueOf(socketServidor.getInetAddress().getHostAddress()));
+			
 			escribirEnConsola("Esperando a que se conecte un usuario...");
 			
 			chat = new Chat("localhost", puerto); //Nuevo objeto de tipo Chat
 			chatDAO = new ChatDAO(); //Nuevo objeto de tipo ChatDAO
 			
+			try{
+			
 			id_chat = chatDAO.insert(chat); //Llamada al metodo inset de la clase ChatDAO
+			
+			}catch(Exception ex){
+				
+				JOptionPane.showMessageDialog(null, ("ERROR:la conexión con la base de datos ha fallado: "),
+						"Error de base de datos",JOptionPane.ERROR_MESSAGE);
+
+				
+			}
 			
 			
 			while(true){

@@ -135,6 +135,7 @@ public class ChatPresentacion extends JFrame {
 		menu.addSeparator();
 		
 		miSalir = new JMenuItem("Salir");
+		miSalir.setToolTipText("Click para salir de la aplicación");
 		menu.add(miSalir);
 		
 		miSalir.addActionListener(new ActionListener(){
@@ -185,7 +186,9 @@ public class ChatPresentacion extends JFrame {
 		rbmiWhachat.setSelected(true);
 		
 		lblNickUsuario = new JLabel();
+		lblNickUsuario.setToolTipText("Usuario");
 		lblIp = new JLabel();
+		lblIp.setToolTipText("IP del servidor");
 		lblPista = new JLabel("Escribe aquí un mensaje...");
 		
 		try {
@@ -209,6 +212,7 @@ public class ChatPresentacion extends JFrame {
 		
 		tfMensajes = new JTextField(30);
 		tfMensajes.requestFocus();
+		tfMensajes.setToolTipText("Escriba aquí su mensaje");
 		tfMensajes.addActionListener(new ActionListener(){
 
 			@Override
@@ -230,6 +234,7 @@ public class ChatPresentacion extends JFrame {
 			btnEnviar.setBorder(BorderFactory.createEmptyBorder());
 			btnEnviar.setContentAreaFilled(false);
 			btnEnviar.setBounds(350, 10, 50, 25);
+			btnEnviar.setToolTipText("Enviar mensaje");
 			
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
